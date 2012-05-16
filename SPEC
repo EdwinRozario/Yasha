@@ -26,3 +26,10 @@ TableStructure:
 Rows:
     keys: YashA:<DataBases.index('mydatabase')>:tables.index('mytable'):row values Example: "YashA:1:2::20||car||2012 23:45:54"
     value: intiger (incremented while wach insertion)
+
+
+Table updateion:
+
+1.counter
+2.search values   : "YashA:1:3:field_value" => counter
+3.reverse mapping : "YashA:1:3:#{counter}" => feild1||feild2||feild3
