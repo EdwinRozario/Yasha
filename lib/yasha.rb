@@ -59,7 +59,7 @@ class Yasha
     @table_struct = fields
     @table_id = tables.index(table_name) 
     @counter_key = "YashA:counter:#{@database_id}:#{@table_id}"
-    @redis_connection.set(@counter_key, 1)
+    @redis_connection.set(@counter_key, 0)
   end
 
 ###SETTING###
@@ -112,19 +112,23 @@ class Yasha
 
 ###SELECT###
 
-  def self.select_by_condition key, value
+  def self.select_by_condition key, value, limit = nil
     result_ids = []
-    rows = @redis_connection.keys("YashA:Row:#{@database_id}:#{@table_id}:#{@table_struct.index(key)}:*")
+    rows = @redis_connection.keys("YashA:#{@database_id}:#{@table_id}:#{@table_struct.index(key)}:#{value}:*")
+    rows = rows.slice(0, limit) if not limit.nil?
     rows.each do |row|
-      result_row << @redis_connection.get(row)
+      result_ids << @redis_connection.get(row)
     end
-    result_ids
+    return result_ids
   end
 
-  def self.select_by_conditions query
+  def self.select_by_conditions query, limit = nil
     result_ids = []
+
     query.each do |key, value|
-      result_ids << self.select_by_condition(key, value)
+      condition_ids = self.select_by_condition(key, value, limit)     
+      result_ids = result_ids.empty? ? condition_ids : result_ids & condition_ids
+      return [] if result_ids.empty? or condition_ids.empty?
     end
     
     results = []
@@ -134,12 +138,12 @@ class Yasha
       results << OpenStruct.new(row)
     end
 
-    result
+    return results
 
   end
 
   def self.select_by_id id
-    return nil if id > @redis_connection.get(@counter_key).to_i or id < 1
+    return nil if id > @redis_connection.get(@counter_key).to_i - 1 or id < 0
     row = JSON.parse(@redis_connection.get("YashA:Row:#{@database_id}:#{@table_id}:#{id}"))
     return OpenStruct.new(row)
   end
@@ -148,14 +152,8 @@ class Yasha
     result_list = []
 
     number.times do |id|
-      result_object = OpenStruct.new
       row = JSON.parse(@redis_connection.get("YashA:Row:#{@database_id}:#{@table_id}:#{id}"))
-       
-      row.each do |key, value|
-        exec "result_object.#{key} = #{value}"
-      end
-
-      result_list << result_object
+      result_list << OpenStruct.new(row)      
     end
 
     result_list.length == 1 ? result_list[0] : result_list
@@ -163,13 +161,21 @@ class Yasha
   end
 
   def self.select_all limit = nil
-    limit.nil? ? self.select_rows(@redis_connection.get(@counter_key)) : self.select_rows(limit)
+    limit.nil? ? self.select_rows(@redis_connection.get(@counter_key).to_i) : self.select_rows(limit)
   end
 
   def self.select query = nil
+
     return self.select_all if query.nil?
-    return self.select_by_id(query[:id]) if query.has_key? :id
-    return self.select_by_conditions(query) if query.has_key? :conditions
+
+    case
+    when (query.has_key? :id) then return self.select_by_id(query[:id])
+    when (query.has_key? :limit and not query.has_key? :conditions) then return self.select_all(query[:limit])
+    when (query.has_key? :limit and query.has_key? :conditions) then return self.select_by_conditions(query[:conditions], query[:limit])
+    when (not query.has_key? :limit and query.has_key? :conditions) then return self.select_by_conditions(query[:conditions])
+    else return nil
+    end
+
   end
 
 end
@@ -201,15 +207,19 @@ end
 
 Job.details
 
-#Job.insert({"name" => "VasiliChuikov", "alias" => "SaviorStalingrad", "nationality" => "Russian"}) #Working Fine
-#Job.insert({"name" => "MontGomery", "alias" => "DesertStorm", "nationality" => "British"}) #Working Fine
-#Job.insert({"name" => "Fermanshtine", "alias" => "BerlinGuard", "nationality" => "German"}) #Working Fine
-#Job.insert({"name" => "DouglasMcAurthor", "alias" => "BeBack", "nationality" => "USA"}) #Working Fine
-#Job.insert({"name" => "ErwinRomell", "alias" => "DesertFox", "nationality" => "German"}) #Working Fine
-#Job.insert({"name" => "Patton", "alias" => "TheTank", "nationality" => "USA"}) #Working Fine
-#Job.insert({"name" => "Fredrik Paulo", "alias" => "Barbarosa", "nationality" => "German"}) #Working Fine
+#Job.insert({"name" => "VasiliChuikov", "alias" => "SaviorStalingrad", "nationality" => "Russian"}) #WF
+#Job.insert({"name" => "MontGomery", "alias" => "DesertStorm", "nationality" => "British"}) #WF
+#Job.insert({"name" => "Fermanshtine", "alias" => "BerlinGuard", "nationality" => "German"}) #WF
+#Job.insert({"name" => "DouglasMcAurthor", "alias" => "BeBack", "nationality" => "USA"}) #WF
+#Job.insert({"name" => "ErwinRomell", "alias" => "DesertFox", "nationality" => "German"}) #WF
+#Job.insert({"name" => "Patton", "alias" => "TheTank", "nationality" => "USA"}) #WF
+#Job.insert({"name" => "Fredrik Paulo", "alias" => "Barbarosa", "nationality" => "German"}) #WF
 
-#Job.select(:id => 2).alias #Working Fine
-
+#Job.select(:id => 5).name #WF
+#Job.select #WF
+#Job.select(:limit => 6) #WF
+#Job.select(:conditions => {"name" => "Patton"}) #WF
+#Job.select(:conditions => {"nationality" => "German"}, :limit => 2) #WF
+#Job.select(:conditions => {"nationality" => "German", "name" => "*o*", "alias" => "*t*"}) #WF
 
 ###############
