@@ -244,6 +244,41 @@ class Yasha
 
   end
 
+###DELETE###
+
+  def self.delete_by_index index
+    rows = @redis_connection.keys("YashA:#{@database_id}:#{@table_id}:*:*:#{index}")
+    rows.each do |row|
+      @redis_connection.del(row)
+    end
+
+    @redis_connection.del("YashA:Row:#{@database_id}:#{@table_id}:#{index}")
+  end
+
+  def self.delete_row row
+    #PENDING
+  end
+
+  def self.delete_by_condition conditions
+    rows = self.select_by_conditions(conditions, nil, 0)
+    return false if rows.nil?
+    
+    rows.each do |row|
+      self.delete_row row
+    end
+
+  end
+
+  def self.delete deletion
+
+    if deletion.has_key? :index
+      self.delete_by_index deletion[:index]
+    else
+      self.delete_by_condition deletion[:conditions]
+    end
+
+  end
+
 end
 
 
@@ -291,5 +326,5 @@ Job.details
 #Job.update(:set => {"name" => "WalterModel", "alias" => "BulgeBat"}, :conditions => {"name" => "Fermanshtine"}) #WF
 #Job.update(:set => {"name" => "Fermanchtine", "alias" => "BerlinGuard", "nationality" => "German"}, :index => 2) #WF
 
-#Job.delete(:condition => {}, :id => 1)
+#Job.delete(:conditions => {}, :id => 1)
 ###############
