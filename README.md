@@ -19,7 +19,7 @@ Enables to make an SQL like data structure using Redis. And use it as an ORM for
     end
 
 ##Check if database and tabe exists and create them in Class definition
-    class Job < Yasha
+    class Generals  < Yasha
       if self.is_database 'history'    #Checks if database exist
         self.database_is 'history'
       else
@@ -34,26 +34,26 @@ Enables to make an SQL like data structure using Redis. And use it as an ORM for
     end
 
 ##INSERT Operation
-    Job.insert({"name" => "MontGomery", "alias" => "DesertStorm", "nationality" => "British"}) #argument is a hash with fields as keys and data for each field as value  
-    Job.insert({"name" => "DouglasMcAurthor", "alias" => "BeBack", "nationality" => "USA"})
-    Job.insert({"name" => "ErwinRomell", "alias" => "DesertFox", "nationality" => "German"})
+    Generals.insert({"name" => "MontGomery", "alias" => "DesertStorm", "nationality" => "British"}) #argument is a hash with fields as keys and data for each field as value  
+    Generals.insert({"name" => "DouglasMcAurthor", "alias" => "BeBack", "nationality" => "USA"})
+    Generals.insert({"name" => "ErwinRomell", "alias" => "DesertFox", "nationality" => "German"})
 
 ##SELECT Operations
-    Job.select                                                          #Selects every row in the table. Return value will be an array of objects. Each object.feild name will give the vale of the selected row.
-    Job.select(:index => 5)                                             #Select rows with index 5
-    Job.select(:limit => 6)                                             #Select first 6 rows
-    Job.select(:conditions => {"name" => "Patton"})                     #Select row with name = 'patton'
-    Job.select(:conditions => {"nationality" => "German"}, :limit => 2) #Select first 2 rows with nationality = 'German'
-    Job.select(:conditions => {"name" => "Erwin*"})                     #Select rows with name like "Erwin%"
+    Generals.select                                                          #Selects every row in the table. Return value will be an array of objects. Each object.feild name will give the vale of the selected row.
+    Generals.select(:index => 5)                                             #Select rows with index 5
+    Generals.select(:limit => 6)                                             #Select first 6 rows
+    Generals.select(:conditions => {"name" => "Patton"})                     #Select row with name = 'patton'
+    Generals.select(:conditions => {"nationality" => "German"}, :limit => 2) #Select first 2 rows with nationality = 'German'
+    Generals.select(:conditions => {"name" => "Erwin*"})                     #Select rows with name like "Erwin%"
 
 ##UPDATE rows
-    Job.update(:set => {"name" => "VasiliChuikov", "alias" => "SaviourStalingrad"}, :conditions => {"name" => "MontGomery"}) #Updating row with condition
-    Job.update(:set => {"name" => "Fermanchtine", "alias" => "BerlinGuard", "nationality" => "German"}, :index => 2)         #Updating row with index
+    Generals.update(:set => {"name" => "VasiliChuikov", "alias" => "SaviourStalingrad"}, :conditions => {"name" => "MontGomery"}) #Updating row with condition
+    Generals.update(:set => {"name" => "Fermanchtine", "alias" => "BerlinGuard", "nationality" => "German"}, :index => 2)         #Updating row with index
 
 ##DELETE rows
-    Job.delete(:index => 1)                             #Delete row with index
-    Job.delete(:conditions => {"nationality" => "USA"}) #Delete row with condition
-    Job.delete(:conditions => "all")                    #Delete all rows(Truncate)
+    Generals.delete(:index => 1)                             #Delete row with index
+    Generals.delete(:conditions => {"nationality" => "USA"}) #Delete row with condition
+    Generals.delete(:conditions => "all")                    #Delete all rows(Truncate)
 
 #Note
 1. Database and tables for Yasha can be made with Yasha only.
