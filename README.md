@@ -39,12 +39,21 @@ Enables to make an SQL like data structure using Redis. And use it as an ORM for
     Job.insert({"name" => "ErwinRomell", "alias" => "DesertFox", "nationality" => "German"})
 
 ##SELECT Operations
-    Job.select                                                          #Selects every row in the table
+    Job.select                                                          #Selects every row in the table. Return value will be an array of objects
     Job.select(:index => 5)                                             #Select rows with index 5
     Job.select(:limit => 6)                                             #Select first 6 rows
     Job.select(:conditions => {"name" => "Patton"})                     #Select row with name = 'patton'
     Job.select(:conditions => {"nationality" => "German"}, :limit => 2) #Select first 2 rows with nationality = 'German'
     Job.select(:conditions => {"name" => "Erwin*"})                     #Select rows with name like "Erwin%"
+
+##UPDATE rows
+    Job.update(:set => {"name" => "VasiliChuikov", "alias" => "SaviourStalingrad"}, :conditions => {"name" => "MontGomery"}) #Updating row with condition
+    Job.update(:set => {"name" => "Fermanchtine", "alias" => "BerlinGuard", "nationality" => "German"}, :index => 2)         #Updating row with index
+
+##DELETE rows
+    Job.delete(:index => 1)                             #Delete row with index
+    Job.delete(:conditions => {"nationality" => "USA"}) #Delete row with condition
+    Job.delete(:conditions => "all")                    #Delete all rows(Truncate)
 
 #Note
 1. Database and tables for Yasha can be made with Yasha only.
