@@ -39,7 +39,7 @@ Enables to make an SQL like data structure using Redis. And use it as an ORM for
     Job.insert({"name" => "ErwinRomell", "alias" => "DesertFox", "nationality" => "German"})
 
 ##SELECT Operations
-    Job.select                                                          #Selects every row in the table. Return value will be an array of objects
+    Job.select                                                          #Selects every row in the table. Return value will be an array of objects. Each object.feild name will give the vale of the selected row.
     Job.select(:index => 5)                                             #Select rows with index 5
     Job.select(:limit => 6)                                             #Select first 6 rows
     Job.select(:conditions => {"name" => "Patton"})                     #Select row with name = 'patton'
