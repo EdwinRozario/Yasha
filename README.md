@@ -13,12 +13,10 @@ Enables to make an SQL like data structure using Redis. And use it as an ORM for
 <tt>require 'yasha'</tt>
 
 <h3>Define Class</h3>
-<p>
-  class Generals < Yasha
-    self.database_is 'history'
-    self.table_is 'generals'
-  end
-</p>
+<p>class Generals < Yasha</p>
+<p>  self.database_is 'history'</p>
+<p>  self.table_is 'generals'</p>
+<p>end</p>
 
 <h3>Check if database and database exists and create them in Class definition</h3>
 
