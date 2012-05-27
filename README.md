@@ -9,16 +9,29 @@ Enables to make an SQL like data structure using Redis. And use it as an ORM for
 <tt>redis(2.2.2)</tt>
 <tt>json(1.5.3)</tt>
 
-#Usage
+#Require
 <tt>require 'yasha'</tt>
 
-<h3>Define Class</h3>
-<p>class Generals < Yasha</p>
-<p>  self.database_is 'history'</p>
-<p>  self.table_is 'generals'</p>
-<p>end</p>
+##Define Class
+    class Generals < Yasha
+      self.database_is 'history' #Setting database for class
+      self.table_is 'generals'   #Setting table for the calss
+    end
 
-<h3>Check if database and database exists and create them in Class definition</h3>
+##Check if database and tabe exists and create them in Class definition
+    class Job < Yasha
+      if self.is_database 'history'    # Checks if database exist
+        self.database_is 'history'
+      else
+        self.create_database 'history' # Creates database
+      end
+
+      if self.is_table 'generals', 'history' # Checks if table exist in database
+         self.table_is 'generals'
+      else
+         self.create_table 'generals', 'name', 'alias', 'nationality' # Creating table. First argument is table name and rest fields for the table
+       end
+    end
 
 
 #Note
