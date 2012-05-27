@@ -47,7 +47,8 @@ Enables to make an SQL like data structure using Redis. And use it as an ORM for
     Generals.select(:conditions => {"name" => "Erwin*"})                     #Select rows with name like "Erwin%"
 
 ##UPDATE rows
-    Generals.update(:set => {"name" => "VasiliChuikov", "alias" => "SaviourStalingrad"}, :conditions => {"name" => "MontGomery"}) #Updating row with condition
+    Generals.update(:set => {"name" => "VasiliChuikov", "alias" => "SaviourStalingrad"}, :conditions => {"name" => "MontGomery"}) #Updating row with 
+    condition. Hash in :set is the new values.
     Generals.update(:set => {"name" => "Fermanchtine", "alias" => "BerlinGuard", "nationality" => "German"}, :index => 2)         #Updating row with index
 
 ##DELETE rows
