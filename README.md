@@ -6,18 +6,19 @@ Enables to make an SQL like data structure using Redis. And use it as an ORM for
 <tt>gem install yasha</tt>
 
 #Requirements 
-<tt>redis(2.2.2)
-json(1.5.3)</tt>
+<tt>redis(2.2.2)</tt>
+<tt>json(1.5.3)</tt>
 
 #Usage
 <tt>require 'yasha'</tt>
 
-<h1>Define Class</h1>
-<tt>class Generals < Yasha
-  self.database_is 'history'
-  self.table_is 'generals'
-end</tt>
+<h3>Define Class</h3>
+  class Generals < Yasha
+    self.database_is 'history'
+    self.table_is 'generals'
+  end
 
+<h3></h3>
 
 #Note
 1. Database and tables for Yasha can be made with Yasha only.
