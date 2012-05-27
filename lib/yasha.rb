@@ -5,13 +5,15 @@ require 'ostruct'
 
 class Yasha
 
-  attr_accessor :database, :table, :database_id, :table_id, :counter_key
+  attr_accessor :database, :table, :database_id, :table_id, :counter_key, :host, :port, :redis_connection, :table_struct
   
   def initialize
     @database = nil
     @database_id = nil
     @table = nil
     @table_id = nil
+    @host = "127.0.0.1"
+    @port = 6379
     @redis_connection = nil
     @table_struct = nil
     @counter_key = nil
@@ -25,7 +27,7 @@ class Yasha
   end
 
   def self.initial_check
-    @redis_connection = Redis.new
+    @redis_connection = Redis.new(:host => @host,:port => @port)
     self.initialize_redis if @redis_connection.get("YashA:DataBases").nil?
   end
 
@@ -64,6 +66,14 @@ class Yasha
 
 ###SETTING###
 
+  def self.host_is host
+    @host = host
+  end
+
+  def self.port_is port
+    @port = port
+  end
+
   def self.database_is name
     self.initial_check
     @database = name
@@ -74,6 +84,8 @@ class Yasha
 
   def self.table_is name
     @table = name
+
+    p "YashA:#{@database}"
 
     tables = JSON.parse(@redis_connection.get("YashA:#{@database}"))
     @table_id = tables.index(name)
@@ -255,16 +267,23 @@ class Yasha
     @redis_connection.del("YashA:Row:#{@database_id}:#{@table_id}:#{index}")
   end
 
-  def self.delete_row row
-    #PENDING
+  def self.delete_all
+    rows = @redis_connection.keys("YashA:#{@database_id}:#{@table_id}:*") + @redis_connection.keys("YashA:Row:#{@database_id}:#{@table_id}:*")
+    rows.each do |row|
+      @redis_connection.del(row)
+    end
+    @redis_connection.set(@counter_key, 0)
   end
 
   def self.delete_by_condition conditions
+
+    self.delete_all if conditions == "all"
+
     rows = self.select_by_conditions(conditions, nil, 0)
     return false if rows.nil?
     
     rows.each do |row|
-      self.delete_row row
+      self.delete_by_index row["index"]
     end
 
   end
@@ -287,26 +306,25 @@ end
 #########
 
 
-class Job < Yasha
-  if self.is_database 'history'
-    puts "DB Exists"
-    self.database_is 'history'
-  else
-    puts "DB Dosent Exist"
-    self.create_database 'history'
-  end
+#class Job < Yasha
+#  if self.is_database 'history'
+#    puts "DB Exists"
+#    self.database_is 'history'
+#  else
+#    puts "DB Dosent Exist"
+#    self.create_database 'history'
+#  end
 
-  if self.is_table 'generals', 'history'
-    puts "Table Exists"
-    self.table_is 'generals'
-  else
-    puts "Table Dosent Exist"
-    self.create_table 'generals', 'name', 'alias', 'nationality'
-  end
+#  if self.is_table 'generals', 'history'
+#    puts "Table Exists"
+#    self.table_is 'generals'
+#  else
+#    puts "Table Dosent Exist"
+#    self.create_table 'generals', 'name', 'alias', 'nationality'
+#  end
+#end
 
-end
-
-Job.details
+#Job.details
 
 #Job.insert({"name" => "VasiliChuikov", "alias" => "SaviorStalingrad", "nationality" => "Russian"}) #WF
 #Job.insert({"name" => "MontGomery", "alias" => "DesertStorm", "nationality" => "British"}) #WF
@@ -321,10 +339,12 @@ Job.details
 #Job.select(:limit => 6) #WF
 #Job.select(:conditions => {"name" => "Patton"}) #WF
 #Job.select(:conditions => {"nationality" => "German"}, :limit => 2) #WF
-#Job.select(:conditions => {"nationality" => "German", "name" => "*o*", "alias" => "*t*") #WF
+#Job.select(:conditions => {"nationality" => "German", "name" => "*o*", "alias" => "*t*"}) #WF
 
 #Job.update(:set => {"name" => "WalterModel", "alias" => "BulgeBat"}, :conditions => {"name" => "Fermanshtine"}) #WF
 #Job.update(:set => {"name" => "Fermanchtine", "alias" => "BerlinGuard", "nationality" => "German"}, :index => 2) #WF
 
-#Job.delete(:conditions => {}, :id => 1)
-###############
+#Job.delete(:index => 1) #WF
+#Job.delete(:conditions => {"nationality" => "USA"}) #WF
+#Job.delete(:conditions => "all") #WF
+
