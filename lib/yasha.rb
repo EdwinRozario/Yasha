@@ -85,8 +85,6 @@ class Yasha
   def self.table_is name
     @table = name
 
-    p "YashA:#{@database}"
-
     tables = JSON.parse(@redis_connection.get("YashA:#{@database}"))
     @table_id = tables.index(name)
 
