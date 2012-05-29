@@ -14,20 +14,20 @@ Enables to make an SQL like data structure using Redis. And use it as an ORM for
 
 ##Define Class
     class Generals < Yasha
-      self.database_is 'history' #Setting database for class
-      self.table_is 'generals'   #Setting table for the calss
+      self.database 'history' #Setting database for class
+      self.table 'generals'   #Setting table for the calss
     end
 
 ##Check if database and table exists and create them in Class definition
     class Generals  < Yasha
-      if self.is_database 'history'    #Checks if database exist
-        self.database_is 'history'
+      if self.database? 'history'    #Checks if database exist
+        self.database 'history'
       else
         self.create_database 'history' #Creates database
       end
 
-      if self.is_table 'generals', 'history'                          #Checks if table exist in database
-         self.table_is 'generals'
+      if self.table? 'generals', 'history'                          #Checks if table exist in database
+         self.table 'generals'
       else
          self.create_table 'generals', 'name', 'alias', 'nationality' #Creating table. First argument is table name and rest fields for the table.
        end

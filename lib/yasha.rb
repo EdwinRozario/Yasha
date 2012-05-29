@@ -7,7 +7,7 @@ class Yasha
 
   attr_accessor :database, :table, :database_id, :table_id, :counter_key, :host, :port, :redis_connection, :table_struct
   
-  def initialize
+  def self.initialize_yasha
     @database = nil
     @database_id = nil
     @table = nil
@@ -17,7 +17,6 @@ class Yasha
     @redis_connection = nil
     @table_struct = nil
     @counter_key = nil
-    self.initial_check
   end
 
 ###CHECKS###
@@ -27,16 +26,17 @@ class Yasha
   end
 
   def self.initial_check
+    self.initialize_yasha
     @redis_connection = Redis.new(:host => @host,:port => @port)
     self.initialize_redis if @redis_connection.get("YashA:DataBases").nil?
   end
 
-  def self.is_database name
+  def self.database? name
     self.initial_check
     JSON.parse(@redis_connection.get("YashA:DataBases")).include? name
   end
 
-  def self.is_table table, database
+  def self.table? table, database
     JSON.parse(@redis_connection.get("YashA:#{database}")).include? table
   end
 
@@ -66,15 +66,15 @@ class Yasha
 
 ###SETTING###
 
-  def self.host_is host
+  def self.host host
     @host = host
   end
 
-  def self.port_is port
+  def self.port port
     @port = port
   end
 
-  def self.database_is name
+  def self.database name
     self.initial_check
     @database = name
 
@@ -82,7 +82,7 @@ class Yasha
     @database_id = yasha_databases.index(name)
   end
 
-  def self.table_is name
+  def self.table name
     @table = name
 
     tables = JSON.parse(@redis_connection.get("YashA:#{@database}"))
@@ -297,3 +297,4 @@ class Yasha
   end
 
 end
+
